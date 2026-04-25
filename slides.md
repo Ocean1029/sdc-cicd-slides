@@ -32,10 +32,10 @@ layout: section
 
 多人共用一條 `main` 分支、直接 push，很容易出事：
 
-- 後 push 的改動會蓋掉前一個人的 commit
+- 改動沒被 review 過就直接進 `main`，bug 沒人擋
+- 並行修同一段程式碼很容易 conflict，merge 過程沒規範
 - 有 bug 的版本一進到 `main` 就會影響上線服務
-- 缺乏 review，沒有人在合併前檢查過改動
-- revert 時 history 已經被多人交錯 commit 打亂，難以乾淨回溯
+- revert 時 history 已被多人交錯 commit 打亂，難以乾淨回溯
 
 ---
 
@@ -140,7 +140,7 @@ layout: section
 - **GitLab CI/CD** — GitLab 內建，跟 GitLab 生態系緊密
 - **Jenkins** — 老牌、可客製化、設定複雜
 - **CircleCI** — 雲端服務，速度快、易用
-- **Travis CI** — 早期紅，對 OSS 友善
+- **Travis CI** — 早期廣為使用，對 OSS 友善
 
 ---
 layout: section
@@ -445,7 +445,7 @@ layout: section
 
 CI 失敗是常態，學會看失敗訊息是 SRE 基本功。
 
-下面這個 workflow 故意把欄位名稱寫錯（`.stars` 應該是 `.stargazers_count`）：
+下面這個 workflow 故意藏了一個 bug，會讓 pipeline 跑到中間就失敗：
 
 ```yaml
 name: Repo Info
@@ -465,8 +465,11 @@ jobs:
 
       - name: Show star count
         run: |
-          STARS=$(jq -e .stars repo.json)   # ← 故意寫錯，正確是 .stargazers_count
+          STARS=$(jq -e .stars repo.json)
           echo "This repo has $STARS stars"
+
+      - name: Show description
+        run: jq -r .description repo.json
 ```
 
 ---
@@ -560,9 +563,9 @@ layout: section
 
 | 檢查 | 做什麼 | 不做會怎樣 |
 |------|-------|----------|
-| **Build** | 把程式碼編譯起來 | 連跑都跑不起來還合進 `main` |
-| **Test** | 跑單元測試 | 改了 A 結果 B 壞掉 |
 | **Lint** | 風格 / 潛在錯誤檢查 | 程式碼亂、隱藏 bug 變多 |
+| **Test** | 跑單元測試 | 改了 A 結果 B 壞掉 |
+| **Build** | 把程式碼編譯起來 | 連跑都跑不起來還合進 `main` |
 
 每次變更都自動執行；任何一個失敗就擋住合併。
 
@@ -808,7 +811,7 @@ layout: section
 
 > 從 push 到使用者看到新功能，全自動，沒有人攔在中間。
 
-這種模式對「自動化測試的信心」要求很高 — 測試是你唯一的安全網。
+這種模式對「自動化測試的信心」要求很高，測試是你唯一的安全網。
 
 ---
 layout: section
@@ -957,7 +960,7 @@ layout: section
 ```
 ┌────────┐     ┌────────────┐     ┌──────────────┐
 │  Code  │────▶│  Staging   │────▶│  Production  │
-│  Merge │     │  (自動)     │     │  (手動核准)   │
+│  Merge │     │  (auto)    │     │  (manual)    │
 └────────┘     └────────────┘     └──────────────┘
 ```
 
@@ -1033,7 +1036,7 @@ layout: section
   ▼
 ┌──────────────── CI (ch3) ────────────────┐
 │  ┌──────┐  ┌──────┐                      │
-│  │ Lint │  │ Test │   ← 平行              │
+│  │ Lint │  │ Test │   ← parallel         │
 │  └──┬───┘  └──┬───┘                      │
 │     └────┬────┘                          │
 │          ▼                               │
@@ -1049,7 +1052,7 @@ layout: section
 │              │   Deploy    │             │
 │              │  to Fly.io  │             │
 │              └─────────────┘             │
-│  （進階：staging → smoke → production）  │
+│  Advanced: staging → smoke → production  │
 └──────────────────────────────────────────┘
 ```
 
@@ -1074,7 +1077,7 @@ layout: section
 - GitOps（ArgoCD、Flux）
 - 監控告警（下一個 workshop 的 Prometheus！）
 
-工作上真的碰到再查。
+實務遇到再深入即可。
 
 ---
 
