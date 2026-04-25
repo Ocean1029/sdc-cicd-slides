@@ -825,44 +825,13 @@ layout: section
 
 ---
 
-# GitHub Environments
+# GitHub Environments & Secrets
 
-讓你定義不同的部署環境（`staging`、`production`），各自獨立設定：
+**Environments**：定義不同的部署環境（`staging`、`production`），各自有獨立的 secrets、protection rules、可部署分支。
 
-- **Secrets** — 不同環境不同的 API key
-- **Protection Rules** — 例如 production 需手動核准
-- **Deployment branches** — 限制哪個分支能部署
+**Secrets**：放 API key、token、密碼。Workflow 裡用 `${{ secrets.XXX }}` 讀；log 會自動遮蔽。
 
----
-
-# Secret 放哪裡？
-
-GitHub 有**兩種** secret，新手常搞混：
-
-| 放法 | 設定位置 | 適用 |
-|------|---------|-----|
-| **Repository secret** | Settings → Secrets and variables → Actions | 所有 workflow / job 都可讀。**最簡單的預設** |
-| **Environment secret** | Settings → Environments → `<env>` → Secrets | 只有宣告 `environment: <name>` 的 job 可讀。可搭配 protection rules |
-
-兩種都用 `${{ secrets.XXX }}` 讀。本章 push image 到 GHCR 用 GitHub 自動產生的 `GITHUB_TOKEN`，不用自己設；實務上若部署需要外部 API key、資料庫密碼才會放這裡。
-
----
-
-# Secrets 安全守則
-
-- **永遠不要硬寫進程式碼**，一律用 `${{ secrets.XXX }}`
-- **Fork PR 不能存取 secrets**（GitHub 自動防護）
-- 成員離開時相關 secrets 立刻輪換
-
-```yaml
-# Good
-env:
-  API_KEY: ${{ secrets.API_KEY }}
-
-# Bad — NEVER do this
-env:
-  API_KEY: "sk-abc123xyz789"
-```
+> **永遠不要把密鑰硬寫進程式碼或 workflow yaml**。本章 push image 到 GHCR 用 GitHub 自動產生的 `GITHUB_TOKEN`，不用自己設；實務上需要外部 API key、資料庫密碼才會自己放 secret。
 
 ---
 layout: section
