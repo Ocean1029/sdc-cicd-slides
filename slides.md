@@ -28,25 +28,20 @@ layout: section
 
 ---
 
-# 直接 push 到 main 的下場
+# 所有人都直接 push main 的問題
 
-Ocean 跟 Andrew 在同一個 repo 開發「Special Ground」，兩個人都直接 push 到 `main`。
+多人共用一條 `main` 分支、直接 push，很容易出事：
 
-- Ocean 推一版，蓋掉 Andrew 前一天的功能
-- 上線中的服務跟著壞掉
-- 想 revert 回去，git history 已經亂成一鍋粥
-
-<!--
-用威士忌熬的那種。Ocean 跟 Andrew 整天搞不好。
--->
+- 後 push 的改動會蓋掉前一個人的 commit
+- 有 bug 的版本一進到 `main` 就會影響上線服務
+- 缺乏 review，沒有人在合併前檢查過改動
+- revert 時 history 已經被多人交錯 commit 打亂，難以乾淨回溯
 
 ---
 
-# Snow 來救火
+# 解法：PR 流程
 
-Snow 教他們改用 PR 流程：
-
-- 各自開分支開發
+- 各自開 feature branch 開發
 - 寫到段落發 **Pull Request**
 - 其他人看 diff、留 comment、提 review
 - 通過了再 merge 回 `main`
@@ -129,7 +124,7 @@ layout: section
 
 ---
 
-# Ocean 的痛點 → CI/CD 怎麼解
+# 對照：有沒有 CI/CD 的差別
 
 | 沒有 CI/CD | 有 CI/CD |
 |-----------|---------|
@@ -1060,7 +1055,7 @@ layout: section
 
 ---
 
-# Ocean 的痛點 vs 現在
+# 原本的痛點 vs 現在
 
 | 原本的痛點 | 現在怎麼解 |
 |-----------|-----------|
