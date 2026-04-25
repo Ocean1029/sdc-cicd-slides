@@ -559,7 +559,9 @@ layout: section
 
 ---
 
-# CI 三件事
+# CI 常見的檢查項目
+
+CI 不限定要做哪些檢查，依專案而定。Go 專案最常見的三項：
 
 | 檢查 | 做什麼 | 不做會怎樣 |
 |------|-------|----------|
@@ -568,6 +570,8 @@ layout: section
 | **Build** | 把程式碼編譯起來 | 連跑都跑不起來還合進 `main` |
 
 每次變更都自動執行；任何一個失敗就擋住合併。
+
+> 其他常見項目：type-check、container image 安全掃描、licence 檢查 …。
 
 ---
 layout: section
